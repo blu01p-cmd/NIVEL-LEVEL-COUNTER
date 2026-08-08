@@ -1,0 +1,794 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#071017" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
+  <title>NIVEL Level Counter</title>
+  <style>
+    :root{
+      --bg:#05090d;
+      --panel:#0a141b;
+      --panel2:#0d1d26;
+      --line:#1f5365;
+      --cyan:#70f6ff;
+      --cyan2:#19bfd0;
+      --text:#e9fbff;
+      --muted:#7ba0aa;
+      --danger:#ff667a;
+      --shadow:0 0 28px rgba(50,220,240,.16);
+    }
+
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      background:
+        radial-gradient(circle at 50% 18%, rgba(34,146,167,.20), transparent 36%),
+        linear-gradient(180deg,#071117 0%,#030608 70%);
+      font-family: Inter, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+      overflow:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed; inset:0;
+      pointer-events:none;
+      opacity:.16;
+      background-image:
+        linear-gradient(rgba(112,246,255,.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(112,246,255,.08) 1px, transparent 1px);
+      background-size:32px 32px;
+      mask-image:linear-gradient(to bottom,black,transparent 80%);
+    }
+
+    .app{
+      min-height:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      padding:calc(22px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom));
+      position:relative;
+    }
+
+    .frame{
+      width:min(92vw, 560px);
+      border:1px solid rgba(112,246,255,.28);
+      background:linear-gradient(180deg,rgba(10,24,31,.94),rgba(6,13,18,.95));
+      box-shadow:var(--shadow), inset 0 0 36px rgba(60,210,230,.04);
+      clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);
+      padding:24px;
+      position:relative;
+    }
+
+    .frame::before,.frame::after{
+      content:"";
+      position:absolute;
+      height:2px;
+      background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+      opacity:.7;
+    }
+    .frame::before{left:56px;right:56px;top:0}
+    .frame::after{left:90px;right:90px;bottom:0}
+
+    .eyebrow{
+      text-align:center;
+      letter-spacing:.28em;
+      font-size:12px;
+      color:var(--cyan);
+      opacity:.9;
+      margin-bottom:10px;
+      font-weight:700;
+    }
+
+    h1{
+      margin:0;
+      text-align:center;
+      font-size:clamp(22px,6vw,34px);
+      letter-spacing:.08em;
+      font-weight:800;
+    }
+
+    .sub{
+      text-align:center;
+      margin-top:7px;
+      color:var(--muted);
+      font-size:13px;
+      letter-spacing:.08em;
+    }
+
+    .level-box{
+      margin:28px auto 24px;
+      width:min(72vw,320px);
+      aspect-ratio:1.25/1;
+      display:grid;
+      place-items:center;
+      position:relative;
+      border:1px solid rgba(112,246,255,.35);
+      background:
+        linear-gradient(135deg,rgba(112,246,255,.08),transparent 36%),
+        rgba(3,10,14,.65);
+      box-shadow:inset 0 0 30px rgba(64,218,235,.08);
+      clip-path:polygon(24px 0,100% 0,100% calc(100% - 24px),calc(100% - 24px) 100%,0 100%,0 24px);
+    }
+
+    .level-box::before{
+      content:"LEVEL";
+      position:absolute;
+      top:15px;
+      left:18px;
+      font-size:11px;
+      letter-spacing:.25em;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    #level{
+      font-size:clamp(88px,28vw,150px);
+      line-height:1;
+      font-weight:900;
+      text-shadow:0 0 28px rgba(112,246,255,.35);
+      color:white;
+      font-variant-numeric:tabular-nums;
+      transform:translateY(6px);
+    }
+
+    .max{
+      position:absolute;
+      right:18px;
+      bottom:14px;
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.12em;
+    }
+
+    .main-btn{
+      appearance:none;
+      border:1px solid rgba(112,246,255,.7);
+      width:100%;
+      min-height:86px;
+      padding:20px;
+      color:#031015;
+      font-size:clamp(20px,5vw,27px);
+      font-weight:900;
+      letter-spacing:.08em;
+      background:
+        linear-gradient(180deg,#9ffaff,#4ce5f2 52%,#20bdcf);
+      box-shadow:
+        0 0 26px rgba(54,225,240,.25),
+        inset 0 1px rgba(255,255,255,.65);
+      clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+      cursor:pointer;
+      transition:transform .06s ease, filter .15s ease, opacity .15s ease;
+      touch-action:manipulation;
+    }
+
+    .main-btn:active{transform:scale(.985);filter:brightness(.92)}
+    .main-btn:disabled{
+      background:linear-gradient(180deg,#4a5960,#253239);
+      color:#9dafb4;
+      border-color:#455961;
+      box-shadow:none;
+      cursor:default;
+      opacity:.75;
+    }
+
+    .status{
+      min-height:24px;
+      margin-top:13px;
+      text-align:center;
+      font-size:13px;
+      color:var(--muted);
+      letter-spacing:.08em;
+    }
+
+    .status.maxed{color:var(--cyan)}
+
+    .max-message{
+      min-height:0;
+      margin:0;
+      padding:0 8px;
+      text-align:center;
+      font-size:11px;
+      line-height:1.55;
+      letter-spacing:.035em;
+      color:#8fb3bc;
+      opacity:0;
+      transform:translateY(-2px);
+      transition:opacity .35s ease, transform .35s ease, margin .35s ease;
+      pointer-events:none;
+    }
+    .max-message.show{
+      margin-top:8px;
+      opacity:.78;
+      transform:translateY(0);
+    }
+
+    .start-overlay{
+      position:fixed;
+      inset:0;
+      z-index:200;
+      display:grid;
+      place-items:center;
+      padding:24px;
+      background:
+        radial-gradient(circle at 50% 36%, rgba(36,166,185,.18), transparent 34%),
+        linear-gradient(180deg,#071117 0%,#030608 100%);
+    }
+    .start-overlay.hide{display:none}
+    .start-card{
+      width:min(88vw,480px);
+      border:1px solid rgba(112,246,255,.30);
+      background:linear-gradient(180deg,rgba(10,24,31,.97),rgba(5,12,17,.98));
+      box-shadow:0 0 34px rgba(50,220,240,.13);
+      padding:30px 24px 26px;
+      text-align:center;
+      clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);
+    }
+    .start-kicker{
+      color:var(--cyan);
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:.26em;
+      margin-bottom:12px;
+    }
+    .start-title{
+      font-size:clamp(24px,7vw,38px);
+      line-height:1.08;
+      font-weight:900;
+      letter-spacing:.07em;
+    }
+    .start-desc{
+      margin-top:11px;
+      color:#7f9ba4;
+      font-size:12px;
+      line-height:1.65;
+    }
+    .start-btn{
+      appearance:none;
+      width:100%;
+      margin-top:24px;
+      min-height:74px;
+      border:1px solid rgba(112,246,255,.75);
+      background:linear-gradient(180deg,#9ffaff,#4ce5f2 52%,#20bdcf);
+      color:#031015;
+      font-size:21px;
+      font-weight:900;
+      letter-spacing:.12em;
+      box-shadow:0 0 26px rgba(54,225,240,.22);
+      clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .start-btn:active{transform:scale(.985)}
+    .install-btn{
+      appearance:none;
+      width:100%;
+      margin-top:10px;
+      min-height:46px;
+      border:1px solid rgba(112,246,255,.30);
+      background:rgba(8,28,36,.76);
+      color:#bfeef3;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.10em;
+      border-radius:4px;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .install-btn:disabled{
+      opacity:.42;
+      cursor:default;
+    }
+    .install-note{
+      margin-top:8px;
+      min-height:18px;
+      color:#78959d;
+      font-size:10px;
+      line-height:1.5;
+    }
+
+    .utility-row{
+      width:min(92vw,560px);
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .utility-btn{
+      appearance:none;
+      border:1px solid rgba(112,246,255,.35);
+      background:rgba(9,29,38,.78);
+      color:#bfeef3;
+      padding:12px 10px;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.08em;
+      border-radius:4px;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+
+    .utility-btn:active{transform:scale(.985)}
+    .utility-btn.danger{
+      border-color:rgba(255,102,122,.45);
+      background:rgba(74,17,28,.35);
+      color:#efb2bb;
+    }
+
+    .notice{
+      display:none;
+      width:min(92vw,560px);
+      margin-top:10px;
+      padding:13px 14px;
+      border:1px solid rgba(112,246,255,.22);
+      background:rgba(5,15,20,.92);
+      color:#b7cbd0;
+      font-size:12px;
+      line-height:1.65;
+      border-radius:4px;
+    }
+    .notice.show{display:block}
+
+    .ended{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:none;
+      place-items:center;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(34,146,167,.16), transparent 34%),
+        #030608;
+      padding:24px;
+      text-align:center;
+    }
+    .ended.show{display:grid}
+    .ended-card{
+      width:min(88vw,460px);
+      border:1px solid rgba(112,246,255,.25);
+      background:#091218;
+      padding:28px 22px;
+      clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px);
+    }
+    .ended-title{
+      color:var(--cyan);
+      letter-spacing:.16em;
+      font-weight:900;
+      font-size:18px;
+      margin-bottom:10px;
+    }
+    .ended-text{
+      color:#94acb3;
+      font-size:13px;
+      line-height:1.7;
+    }
+    .resume-btn{
+      margin-top:18px;
+      width:100%;
+      border:1px solid rgba(112,246,255,.45);
+      background:#0d2a33;
+      color:#d9fbff;
+      padding:13px;
+      font-weight:800;
+      border-radius:4px;
+    }
+
+    .reset-zone{
+      width:min(92vw,560px);
+      margin-top:34px;
+      display:flex;
+      justify-content:flex-end;
+    }
+
+    .reset-btn{
+      appearance:none;
+      border:1px solid rgba(255,102,122,.38);
+      background:rgba(83,16,27,.20);
+      color:#d8949e;
+      padding:11px 16px;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.12em;
+      border-radius:4px;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .reset-btn:active{transform:scale(.98)}
+
+    .confirm{
+      display:none;
+      gap:8px;
+      align-items:center;
+    }
+    .confirm.show{display:flex}
+
+    .confirm span{
+      color:#d6a7ad;
+      font-size:12px;
+    }
+
+    .confirm button{
+      border:1px solid rgba(255,102,122,.5);
+      background:#40131b;
+      color:#ffdce2;
+      padding:9px 12px;
+      border-radius:4px;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .cancel{
+      border-color:rgba(155,180,190,.35)!important;
+      background:#111b20!important;
+      color:#adc0c7!important;
+    }
+
+    .wake-status{
+      margin-top:10px;
+      text-align:center;
+      font-size:10px;
+      letter-spacing:.14em;
+      color:var(--muted);
+      opacity:.85;
+    }
+    .wake-status.on{color:var(--cyan)}
+    .wake-status.warn{color:#d6a7ad}
+
+    .scanline{
+      position:fixed;
+      left:0; right:0; top:-80px;
+      height:80px;
+      background:linear-gradient(180deg,transparent,rgba(112,246,255,.035),transparent);
+      animation:scan 7s linear infinite;
+      pointer-events:none;
+    }
+
+    @keyframes scan{
+      to{transform:translateY(calc(100vh + 160px))}
+    }
+
+    @media (max-height:620px){
+      .app{justify-content:flex-start}
+      .frame{padding:18px;margin-top:4px}
+      .level-box{margin:18px auto}
+      .main-btn{min-height:72px}
+      .reset-zone{margin-top:20px}
+    }
+  </style>
+</head>
+<body>
+  <div class="scanline"></div>
+
+  <div id="startOverlay" class="start-overlay">
+    <div class="start-card">
+      <div class="start-kicker">NIVEL ARENA SUPPORT SYSTEM</div>
+      <div class="start-title">LEVEL COUNTER</div>
+      <div class="start-desc">
+        対戦開始時にタップしてください。<br>
+        フルスクリーン表示と画面常時点灯を開始します。
+      </div>
+      <button id="startBtn" class="start-btn" type="button">BATTLE START</button>
+      <button id="installBtn" class="install-btn" type="button">INSTALL APP</button>
+      <div id="installNote" class="install-note">ホーム画面にアプリとして追加できます</div>
+    </div>
+  </div>
+
+  <main class="app" aria-label="NIVEL Arena level counter">
+    <section class="frame">
+      <div class="eyebrow">COMBAT INTERFACE</div>
+      <h1>NIVEL LEVEL COUNTER</h1>
+      <div class="sub">TURN PROGRESSION / Lv.1–10</div>
+
+      <div class="level-box" aria-live="polite">
+        <div id="level">1</div>
+        <div class="max">MAX 10</div>
+      </div>
+
+      <button id="upBtn" class="main-btn" type="button">
+        TURN START ＋1
+      </button>
+      <div id="maxMessage" class="max-message" aria-live="polite"></div>
+
+      <div id="status" class="status">現在 Lv.1</div>
+      <div id="wakeStatus" class="wake-status">SCREEN LOCK: CHECKING...</div>
+    </section>
+
+    <div class="utility-row">
+      <button id="fullscreenBtn" class="utility-btn" type="button">FULL SCREEN</button>
+      <button id="notificationBtn" class="utility-btn" type="button">通知OFFについて</button>
+    </div>
+
+    <div id="notice" class="notice">
+      Android全体の通知や「おやすみモード」は、Webページから直接切り替えできません。
+      対戦前に端末のクイック設定から「おやすみモード」または通知制限をONにしてください。
+    </div>
+
+    <div class="reset-zone">
+      <button id="resetBtn" class="reset-btn" type="button">RESET</button>
+    </div>
+
+    <div class="utility-row">
+      <div></div>
+      <button id="exitBtn" class="utility-btn danger" type="button">APP END</button>
+    </div>
+  </main>
+
+  <div id="ended" class="ended" aria-hidden="true">
+    <div class="ended-card">
+      <div class="ended-title">SESSION ENDED</div>
+      <div class="ended-text">
+        画面常時点灯を解除し、フルスクリーンを終了しました。<br>
+        完全に閉じる場合は、このタブまたはアプリ画面を閉じてください。
+      </div>
+      <button id="resumeBtn" class="resume-btn" type="button">再開</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const levelEl = document.getElementById('level');
+      const upBtn = document.getElementById('upBtn');
+      const statusEl = document.getElementById('status');
+      const resetBtn = document.getElementById('resetBtn');
+      const wakeStatusEl = document.getElementById('wakeStatus');
+      const maxMessageEl = document.getElementById('maxMessage');
+      const startOverlay = document.getElementById('startOverlay');
+      const startBtn = document.getElementById('startBtn');
+      const installBtn = document.getElementById('installBtn');
+      const installNote = document.getElementById('installNote');
+      const fullscreenBtn = document.getElementById('fullscreenBtn');
+      const notificationBtn = document.getElementById('notificationBtn');
+      const noticeEl = document.getElementById('notice');
+      const exitBtn = document.getElementById('exitBtn');
+      const endedEl = document.getElementById('ended');
+      const resumeBtn = document.getElementById('resumeBtn');
+
+      let level = 1;
+      let wakeLock = null;
+      let maxMessage = "";
+
+      const maxMessages = [
+        "火力、火力ゥ～～！！最大火力ですよ師匠！！",
+        "指揮官氏、最大レベルですぞ。BOOM！BOOM！",
+        "王子様、最大レベルよ。美しいわ。",
+        "大罪レベルに到達しましたわ。",
+        "指揮官！今夜は立派なタランチュラをごちそうしますよ。頑張ってくださいね。",
+        "お花様✿ 最大レベルまで育ちましたね✿",
+        "ベビー、最大レベルだね。調子はどう？",
+        "ヒーロー！！最大レベル！！！",
+        "貴様、ついに最大レベルか！ヴィランとしてしっかり勝て！",
+        "指揮官様！最大レベルよ！キラッキラしてるわ！！",
+        "指揮官。最大レベルに到達しました。私も最大レベルです。…何がとは言いませんが。",
+        "貴官、最大レベルよ。このまま全速前進で突き進むわ…！",
+        "「王子様…！最大レベル…だよ！」",
+        "最大レベルにゃ。寝るにゃ。",
+        "あなた。最大レベルよ。…必ず勝て。",
+        "変人類。最大レベルだ。上手くやれ。",
+        "ぼっちゃん、いよいよ最大レベルかね～記念に1杯どうだい？",
+        "最大レベルだ。ところでそのカードは食えるのか？",
+        "ブラザー！最大レベルです！はぁ…はぁ…私も(検閲されました)",
+        "旦那、ついに高みの果てに到達したようですねぇ。",
+        "え～最大レベル～？でも勝てなきゃ意味無いんじゃないの～？キャハハ！",
+        "最大レベル？興味ありませんね。せっかく淹れたお茶が冷めてしまいます。",
+        "最大レベルじゃないの。鉄くず共も使いようね。せいぜい頑張りなさい。",
+        "三流、最大レベルだ。浮かれて気を抜くなよ。",
+        "ミューズ、最大レベルだ。いい調子だな。",
+        "子ネコさん、最大レベルですね。やっぱり私たちって気が合うと思いません？",
+        "さ、最大レベルか。ひ、引き続き頑張りたまえ…",
+        "ウサギさん！最大レベルですよ～！",
+        "MAX！！Level！！エンタ～～～テイメントーーーーー！！！",
+        "初心者さんー…もう最大レベルですー…",
+        "弟！最大レベルじゃねえか！…ところでレベルって何のレベルだ？",
+        "店長～！最大レベルですよ！お姉ちゃんと一緒に幸運チャージしてあげますね！",
+        "店長、最大レベルですね！ブ、ブランと一緒に幸運チャージしましょう…！",
+        "最大レベルですよん。カードゲームの世界は平和ですねぇ。",
+        "ダーリン♡最大レベルだよ～♡大丈夫、イカサマなんてしてないよ～",
+        "最大レベルです。べ、別に指揮官のためにお知らせしたわけじゃありませんので…！",
+        "さいだいれべるにとうたつしたぞ！さいごまであきらめるな！",
+        "パートナー、最大レベルだよ。とりあえずキスする？",
+        "兄貴！最大レベルになったぞ！",
+        "青二才、最大レベルじゃ！最後まで気を抜くでないぞ！",
+        "最大レベルなのだ！最後まで王国のためにしっかり頑張るのだ！",
+        "おお、最大レベルか。言っただろ？対話は進化の礎だって。",
+        "賢い私が教えてやろう。お前は最大レベルに到達した！",
+        "おお男前！最大レベルってやつになったみたいだな。音楽でも聴くか？"
+      ];
+
+      async function requestWakeLock() {
+        if (!('wakeLock' in navigator)) {
+          wakeStatusEl.textContent = 'SCREEN LOCK: UNSUPPORTED';
+          wakeStatusEl.className = 'wake-status warn';
+          return;
+        }
+
+        if (document.visibilityState !== 'visible') return;
+        if (wakeLock && !wakeLock.released) return;
+
+        try {
+          wakeLock = await navigator.wakeLock.request('screen');
+          wakeStatusEl.textContent = 'SCREEN LOCK: ON';
+          wakeStatusEl.className = 'wake-status on';
+
+          wakeLock.addEventListener('release', () => {
+            wakeStatusEl.textContent = 'SCREEN LOCK: STANDBY';
+            wakeStatusEl.className = 'wake-status';
+          });
+        } catch (err) {
+          wakeStatusEl.textContent = 'SCREEN LOCK: BLOCKED';
+          wakeStatusEl.className = 'wake-status warn';
+        }
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          requestWakeLock();
+        }
+      });
+
+      // Some browsers/platforms are more reliable after a user interaction.
+      document.addEventListener('pointerdown', requestWakeLock, { passive: true });
+
+
+      let deferredInstallPrompt = null;
+
+      window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        installBtn.disabled = false;
+        installNote.textContent = 'この端末にインストールできます';
+      });
+
+      window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+        installBtn.disabled = true;
+        installBtn.textContent = 'INSTALLED';
+        installNote.textContent = 'インストール済みです';
+      });
+
+      installBtn.addEventListener('click', async () => {
+        if (deferredInstallPrompt) {
+          deferredInstallPrompt.prompt();
+          try {
+            await deferredInstallPrompt.userChoice;
+          } catch (e) {}
+          deferredInstallPrompt = null;
+        } else {
+          installNote.textContent = 'Chromeメニューの「アプリをインストール」または「ホーム画面に追加」を使ってください';
+        }
+      });
+
+      if (window.matchMedia('(display-mode: standalone)').matches) {
+        installBtn.disabled = true;
+        installBtn.textContent = 'INSTALLED';
+        installNote.textContent = 'アプリモードで起動中';
+      }
+
+      async function startBattle() {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (e) {}
+
+        await requestWakeLock();
+        startOverlay.classList.add('hide');
+      }
+
+      startBtn.addEventListener('click', startBattle);
+
+      async function toggleFullscreen() {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+          } else {
+            await document.exitFullscreen();
+          }
+        } catch (err) {
+          fullscreenBtn.textContent = 'FULL SCREEN NG';
+          setTimeout(() => fullscreenBtn.textContent = 'FULL SCREEN', 1600);
+        }
+      }
+
+      function updateFullscreenButton() {
+        fullscreenBtn.textContent = document.fullscreenElement ? 'EXIT FULL SCREEN' : 'FULL SCREEN';
+      }
+
+      fullscreenBtn.addEventListener('click', toggleFullscreen);
+      document.addEventListener('fullscreenchange', updateFullscreenButton);
+
+      notificationBtn.addEventListener('click', () => {
+        noticeEl.classList.toggle('show');
+      });
+
+      async function endSession() {
+        try {
+          if (wakeLock && !wakeLock.released) {
+            await wakeLock.release();
+          }
+        } catch (e) {}
+
+        try {
+          if (document.fullscreenElement) {
+            await document.exitFullscreen();
+          }
+        } catch (e) {}
+
+        endedEl.classList.add('show');
+        endedEl.setAttribute('aria-hidden', 'false');
+
+        // Browsers generally refuse to close tabs/windows they did not open,
+        // but this succeeds in a few standalone/window contexts.
+        try { window.close(); } catch (e) {}
+      }
+
+      exitBtn.addEventListener('click', endSession);
+
+      resumeBtn.addEventListener('click', async () => {
+        endedEl.classList.remove('show');
+        endedEl.setAttribute('aria-hidden', 'true');
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (e) {}
+        await requestWakeLock();
+      });
+
+      function render() {
+        levelEl.textContent = level;
+        const maxed = level >= 10;
+
+        upBtn.disabled = maxed;
+        upBtn.textContent = maxed ? 'MAX LEVEL' : 'TURN START ＋1';
+
+        statusEl.textContent = maxed
+          ? 'Lv.10 / MAX'
+          : `現在 Lv.${level}`;
+        statusEl.classList.toggle('maxed', maxed);
+
+        if (maxed && maxMessage) {
+          maxMessageEl.textContent = maxMessage;
+          maxMessageEl.classList.add('show');
+        } else {
+          maxMessageEl.textContent = '';
+          maxMessageEl.classList.remove('show');
+        }
+
+        // 軽い触覚フィードバック対応端末向け
+        if (navigator.vibrate) navigator.vibrate(12);
+      }
+
+      upBtn.addEventListener('click', () => {
+        if (level < 10) {
+          level += 1;
+          if (level === 10) {
+            maxMessage = maxMessages[Math.floor(Math.random() * maxMessages.length)];
+          }
+          render();
+        }
+      });
+
+      resetBtn.addEventListener('click', () => {
+        level = 1;
+        maxMessage = "";
+        render();
+      });
+
+      render();
+
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(() => {});
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
