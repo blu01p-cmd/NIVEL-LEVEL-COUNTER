@@ -67,6 +67,29 @@
       position:relative;
     }
 
+
+    .reset-corner{
+      appearance:none;
+      position:absolute;
+      top:12px;
+      right:14px;
+      z-index:5;
+      border:1px solid rgba(255,102,122,.36);
+      background:rgba(73,18,28,.24);
+      color:#d9a0a8;
+      padding:8px 10px;
+      font-size:10px;
+      font-weight:800;
+      letter-spacing:.12em;
+      border-radius:3px;
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .reset-corner:active{
+      transform:scale(.97);
+      filter:brightness(.92);
+    }
+
     .frame::before,.frame::after{
       content:"";
       position:absolute;
@@ -79,6 +102,7 @@
 
     .eyebrow{
       text-align:center;
+      padding:0 58px;
       letter-spacing:.28em;
       font-size:12px;
       color:var(--cyan);
@@ -101,6 +125,95 @@
       color:var(--muted);
       font-size:13px;
       letter-spacing:.08em;
+    }
+
+
+    .level-main{
+      appearance:none;
+      width:100%;
+      margin:24px auto 0;
+      min-height:238px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      border:1px solid rgba(112,246,255,.56);
+      color:var(--text);
+      background:
+        linear-gradient(135deg,rgba(112,246,255,.09),transparent 38%),
+        linear-gradient(180deg,rgba(3,13,18,.88),rgba(5,18,24,.96));
+      box-shadow:inset 0 0 34px rgba(64,218,235,.08),0 0 24px rgba(54,225,240,.10);
+      clip-path:polygon(22px 0,100% 0,100% calc(100% - 22px),calc(100% - 22px) 100%,0 100%,0 22px);
+      cursor:pointer;
+      touch-action:manipulation;
+    }
+    .level-main:active{transform:scale(.992);filter:brightness(.95)}
+    .level-main.maxed{border-color:rgba(112,246,255,.30);filter:saturate(.86)}
+    .hud-label{
+      position:absolute;top:16px;left:18px;
+      font-size:11px;font-weight:800;letter-spacing:.22em;color:var(--cyan);
+    }
+    .level-number{
+      font-size:clamp(108px,31vw,170px);line-height:.88;font-weight:900;
+      font-variant-numeric:tabular-nums;text-shadow:0 0 30px rgba(112,246,255,.28);
+      transform:translateY(4px);
+    }
+    .tap-hint{
+      position:absolute;bottom:14px;right:16px;
+      font-size:10px;font-weight:700;letter-spacing:.10em;color:#6e929b;
+    }
+    .battle-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+    .counter-card{
+      min-height:118px;border:1px solid rgba(112,246,255,.24);
+      background:rgba(5,17,23,.82);color:var(--text);padding:14px;
+      display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;
+      clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+    }
+    button.counter-card{appearance:none;cursor:pointer;touch-action:manipulation}
+    button.counter-card:active{transform:scale(.985);filter:brightness(.94)}
+    .damage-card{border-color:rgba(255,124,142,.30)}
+    .size-card{
+      border-color:rgba(112,246,255,.42);
+      background:linear-gradient(180deg,rgba(10,38,47,.92),rgba(5,20,27,.90));
+    }
+    .counter-label{font-size:10px;font-weight:800;letter-spacing:.18em;color:#7ca2ab}
+    .counter-value{margin-top:4px;font-size:54px;line-height:1;font-weight:900;font-variant-numeric:tabular-nums}
+    .damage-card .counter-value{color:#ffe8ec}
+    .size-value{color:var(--cyan);text-shadow:0 0 20px rgba(112,246,255,.22)}
+    .counter-hint{margin-top:7px;font-size:9px;letter-spacing:.10em;color:#5f7e87}
+    .field-panel{
+      margin-top:10px;padding:14px;border:1px solid rgba(112,246,255,.24);
+      background:rgba(5,16,22,.88);
+      clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+    }
+    .field-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+    .field-sub{margin-top:4px;color:#5e7b83;font-size:10px}
+    .remaining-cost{
+      flex:0 0 auto;padding:7px 10px;border:1px solid rgba(112,246,255,.32);
+      background:rgba(18,55,65,.34);color:#c9fbff;font-size:14px;font-weight:900;
+      letter-spacing:.04em;border-radius:3px;font-variant-numeric:tabular-nums;
+    }
+    .remaining-cost.over{
+      border-color:rgba(255,102,122,.45);background:rgba(82,20,31,.35);color:#ffc1cb;
+    }
+    .field-stepper{margin-top:12px;display:grid;grid-template-columns:72px 1fr 72px;align-items:center;gap:10px}
+    .step-btn{
+      appearance:none;min-height:62px;border:1px solid rgba(112,246,255,.32);
+      background:rgba(10,31,40,.88);color:#d9fbff;font-size:36px;line-height:1;
+      font-weight:500;border-radius:4px;cursor:pointer;touch-action:manipulation;
+    }
+    .step-btn:active{transform:scale(.97);filter:brightness(.92)}
+    .field-value{text-align:center;font-size:52px;line-height:1;font-weight:900;font-variant-numeric:tabular-nums}
+    @media (max-height:780px){
+      .level-main{min-height:190px;margin-top:16px}
+      .level-number{font-size:clamp(92px,25vw,136px)}
+      .battle-grid{margin-top:10px}
+      .counter-card{min-height:94px}
+      .counter-value{font-size:44px}
+      .field-panel{padding:11px}
+      .step-btn{min-height:52px}
+      .field-value{font-size:44px}
     }
 
     .level-box{
@@ -482,21 +595,49 @@
 
   <main class="app" aria-label="NIVEL Arena level counter">
     <section class="frame">
+      <button id="resetBtn" class="reset-corner" type="button">RESET</button>
       <div class="eyebrow">COMBAT INTERFACE</div>
       <h1>NIVEL LEVEL COUNTER</h1>
       <div class="sub">TURN PROGRESSION / Lv.1–10</div>
 
-      <div class="level-box" aria-live="polite">
-        <div id="level">1</div>
-        <div class="max">MAX 10</div>
-      </div>
-
-      <button id="upBtn" class="main-btn" type="button">
-        TURN START ＋1
+      <button id="levelBtn" class="level-main" type="button" aria-label="リーダーレベルを1上げる">
+        <span class="hud-label">LEADER LEVEL</span>
+        <span id="level" class="level-number">1</span>
+        <span class="tap-hint">TAP TO LEVEL UP / MAX 10</span>
       </button>
+
       <div id="maxMessage" class="max-message" aria-live="polite"></div>
 
-      <div id="status" class="status">現在 Lv.1</div>
+      <section class="battle-grid" aria-label="バトルカウンター">
+        <button id="damageBtn" class="counter-card damage-card" type="button" aria-label="ダメージを1増やす">
+          <span class="counter-label">DAMAGE</span>
+          <span id="damage" class="counter-value">0</span>
+          <span class="counter-hint">TAP +1</span>
+        </button>
+
+        <div class="counter-card size-card" aria-live="polite">
+          <span class="counter-label">CURRENT SIZE</span>
+          <span id="sizeValue" class="counter-value size-value">1</span>
+          <span class="counter-hint">LEVEL + DAMAGE</span>
+        </div>
+      </section>
+
+      <section class="field-panel" aria-label="フィールドコスト">
+        <div class="field-head">
+          <div>
+            <div class="counter-label">FIELD COST</div>
+            <div class="field-sub">フィールド上の合計コスト</div>
+          </div>
+          <div id="remainingCost" class="remaining-cost">あと 1</div>
+        </div>
+
+        <div class="field-stepper">
+          <button id="fieldMinus" class="step-btn" type="button" aria-label="フィールドコストを1減らす">−</button>
+          <div id="fieldCost" class="field-value">0</div>
+          <button id="fieldPlus" class="step-btn" type="button" aria-label="フィールドコストを1増やす">＋</button>
+        </div>
+      </section>
+
       <div id="wakeStatus" class="wake-status">SCREEN LOCK: CHECKING...</div>
     </section>
 
@@ -510,9 +651,6 @@
       対戦前に端末のクイック設定から「おやすみモード」または通知制限をONにしてください。
     </div>
 
-    <div class="reset-zone">
-      <button id="resetBtn" class="reset-btn" type="button">RESET</button>
-    </div>
 
     <div class="utility-row">
       <div></div>
@@ -534,8 +672,14 @@
   <script>
     (() => {
       const levelEl = document.getElementById('level');
-      const upBtn = document.getElementById('upBtn');
-      const statusEl = document.getElementById('status');
+      const levelBtn = document.getElementById('levelBtn');
+      const damageBtn = document.getElementById('damageBtn');
+      const damageEl = document.getElementById('damage');
+      const sizeValueEl = document.getElementById('sizeValue');
+      const fieldMinus = document.getElementById('fieldMinus');
+      const fieldPlus = document.getElementById('fieldPlus');
+      const fieldCostEl = document.getElementById('fieldCost');
+      const remainingCostEl = document.getElementById('remainingCost');
       const resetBtn = document.getElementById('resetBtn');
       const wakeStatusEl = document.getElementById('wakeStatus');
       const maxMessageEl = document.getElementById('maxMessage');
@@ -551,6 +695,8 @@
       const resumeBtn = document.getElementById('resumeBtn');
 
       let level = 1;
+      let damage = 0;
+      let fieldCost = 0;
       let wakeLock = null;
       let maxMessage = "";
 
@@ -598,7 +744,11 @@
         "最大レベルなのだ！最後まで王国のためにしっかり頑張るのだ！",
         "おお、最大レベルか。言っただろ？対話は進化の礎だって。",
         "賢い私が教えてやろう。お前は最大レベルに到達した！",
-        "おお男前！最大レベルってやつになったみたいだな。音楽でも聴くか？"
+        "おお男前！最大レベルってやつになったみたいだな。音楽でも聴くか？",
+        "ワトソン！最大レベルであります！",
+        "最大レベルになったわよ～！あとでボトルキャップちょうだいね。",
+        "最大レベルだ。このままタクティカルに攻め立てろ！",
+        "人間。最大レベルよ。うるさいから早く終わらせましょう。"
       ];
 
       async function requestWakeLock() {
@@ -742,16 +892,24 @@
       });
 
       function render() {
-        levelEl.textContent = level;
         const maxed = level >= 10;
+        const size = level + damage;
+        const remaining = size - fieldCost;
 
-        upBtn.disabled = maxed;
-        upBtn.textContent = maxed ? 'MAX LEVEL' : 'TURN START ＋1';
+        levelEl.textContent = level;
+        damageEl.textContent = damage;
+        sizeValueEl.textContent = size;
+        fieldCostEl.textContent = fieldCost;
 
-        statusEl.textContent = maxed
-          ? 'Lv.10 / MAX'
-          : `現在 Lv.${level}`;
-        statusEl.classList.toggle('maxed', maxed);
+        levelBtn.classList.toggle('maxed', maxed);
+
+        if (remaining >= 0) {
+          remainingCostEl.textContent = `あと ${remaining}`;
+          remainingCostEl.classList.remove('over');
+        } else {
+          remainingCostEl.textContent = `超過 ${Math.abs(remaining)}`;
+          remainingCostEl.classList.add('over');
+        }
 
         if (maxed && maxMessage) {
           maxMessageEl.textContent = maxMessage;
@@ -760,23 +918,45 @@
           maxMessageEl.textContent = '';
           maxMessageEl.classList.remove('show');
         }
-
-        // 軽い触覚フィードバック対応端末向け
-        if (navigator.vibrate) navigator.vibrate(12);
       }
 
-      upBtn.addEventListener('click', () => {
+      levelBtn.addEventListener('click', () => {
         if (level < 10) {
           level += 1;
           if (level === 10) {
             maxMessage = maxMessages[Math.floor(Math.random() * maxMessages.length)];
           }
+          if (navigator.vibrate) navigator.vibrate(12);
           render();
         }
       });
 
+      damageBtn.addEventListener('click', () => {
+        if (damage < 10) {
+          damage += 1;
+          if (navigator.vibrate) navigator.vibrate(10);
+          render();
+        }
+      });
+
+      fieldMinus.addEventListener('click', () => {
+        if (fieldCost > 0) {
+          fieldCost -= 1;
+          if (navigator.vibrate) navigator.vibrate(8);
+          render();
+        }
+      });
+
+      fieldPlus.addEventListener('click', () => {
+        fieldCost += 1;
+        if (navigator.vibrate) navigator.vibrate(8);
+        render();
+      });
+
       resetBtn.addEventListener('click', () => {
         level = 1;
+        damage = 0;
+        fieldCost = 0;
         maxMessage = "";
         render();
       });

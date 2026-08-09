@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nivel-level-counter-v1';
+const CACHE_NAME = 'nivel-level-counter-v4';
 const ASSETS = [
   './',
   './index.html',
