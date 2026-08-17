@@ -129,14 +129,9 @@
 
 
     .level-main{
-      appearance:none;
       width:100%;
       margin:24px auto 0;
       min-height:238px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
       position:relative;
       border:1px solid rgba(112,246,255,.56);
       color:var(--text);
@@ -145,11 +140,51 @@
         linear-gradient(180deg,rgba(3,13,18,.88),rgba(5,18,24,.96));
       box-shadow:inset 0 0 34px rgba(64,218,235,.08),0 0 24px rgba(54,225,240,.10);
       clip-path:polygon(22px 0,100% 0,100% calc(100% - 22px),calc(100% - 22px) 100%,0 100%,0 22px);
+      overflow:hidden;
+    }
+    .level-main.maxed{border-color:rgba(112,246,255,.30);filter:saturate(.86)}
+    .level-hit{
+      appearance:none;
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      background:transparent;
+      color:var(--text);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
       cursor:pointer;
       touch-action:manipulation;
     }
-    .level-main:active{transform:scale(.992);filter:brightness(.95)}
-    .level-main.maxed{border-color:rgba(112,246,255,.30);filter:saturate(.86)}
+    .level-hit:active{transform:scale(.992);filter:brightness(.95)}
+    .level-minus{
+      appearance:none;
+      position:absolute;
+      left:12px;
+      bottom:10px;
+      z-index:4;
+      width:34px;
+      height:30px;
+      border:1px solid rgba(140,180,190,.22);
+      background:rgba(8,21,27,.62);
+      color:#6f8f98;
+      font-size:20px;
+      line-height:1;
+      font-weight:500;
+      border-radius:3px;
+      cursor:pointer;
+      touch-action:manipulation;
+      opacity:.72;
+    }
+    .level-minus:active{
+      transform:scale(.95);
+      opacity:1;
+      color:#b9d5db;
+      border-color:rgba(140,200,210,.38);
+    }
     .hud-label{
       position:absolute;top:16px;left:18px;
       font-size:11px;font-weight:800;letter-spacing:.22em;color:var(--cyan);
@@ -600,11 +635,14 @@
       <h1>NIVEL LEVEL COUNTER</h1>
       <div class="sub">TURN PROGRESSION / Lv.1–10</div>
 
-      <button id="levelBtn" class="level-main" type="button" aria-label="リーダーレベルを1上げる">
-        <span class="hud-label">LEADER LEVEL</span>
-        <span id="level" class="level-number">1</span>
-        <span class="tap-hint">TAP TO LEVEL UP / MAX 10</span>
-      </button>
+      <div class="level-main">
+        <button id="levelBtn" class="level-hit" type="button" aria-label="リーダーレベルを1上げる">
+          <span class="hud-label">LEADER LEVEL</span>
+          <span id="level" class="level-number">1</span>
+          <span class="tap-hint">TAP TO LEVEL UP / MAX 10</span>
+        </button>
+        <button id="levelMinus" class="level-minus" type="button" aria-label="リーダーレベルを1下げる">−</button>
+      </div>
 
       <div id="maxMessage" class="max-message" aria-live="polite"></div>
 
@@ -673,6 +711,7 @@
     (() => {
       const levelEl = document.getElementById('level');
       const levelBtn = document.getElementById('levelBtn');
+      const levelMinus = document.getElementById('levelMinus');
       const damageBtn = document.getElementById('damageBtn');
       const damageEl = document.getElementById('damage');
       const sizeValueEl = document.getElementById('sizeValue');
@@ -901,7 +940,7 @@
         sizeValueEl.textContent = size;
         fieldCostEl.textContent = fieldCost;
 
-        levelBtn.classList.toggle('maxed', maxed);
+        levelBtn.closest('.level-main').classList.toggle('maxed', maxed);
 
         if (remaining >= 0) {
           remainingCostEl.textContent = `あと ${remaining}`;
@@ -927,6 +966,15 @@
             maxMessage = maxMessages[Math.floor(Math.random() * maxMessages.length)];
           }
           if (navigator.vibrate) navigator.vibrate(12);
+          render();
+        }
+      });
+
+      levelMinus.addEventListener('click', () => {
+        if (level > 1) {
+          level -= 1;
+          if (level < 10) maxMessage = "";
+          if (navigator.vibrate) navigator.vibrate(8);
           render();
         }
       });
